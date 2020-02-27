@@ -1,5 +1,6 @@
 package main;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -44,6 +45,20 @@ public class DBApp {
         // Method for deserialization of object 
         Table t = (Table)in.readObject();
 		t.deleteFromTable(strTableName, ht);
+		
+		for(String pageDir: t.pages) {
+			FileInputStream fileP = new FileInputStream(pageDir);
+			ObjectInputStream inP = new ObjectInputStream(fileP);
+			
+			Page p = (Page) inP.readObject();
+			if(p.size()==0) {
+				File toDel = new File(pageDir);
+            	System.out.println(pageDir);
+            	System.out.println(toDel.delete());
+            	t.pages.remove(pageDir);
+			}
+		}
+		
 		//serialize
 		FileOutputStream fileO = new FileOutputStream(dir);
         ObjectOutputStream out = new ObjectOutputStream(fileO);
@@ -51,6 +66,7 @@ public class DBApp {
         
         out.close(); 
         fileO.close();
+        
 	}
 	
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
@@ -78,7 +94,7 @@ public class DBApp {
 		ht3.put("id", new Integer(2));
 		ht3.put("name", "Mai");
 		ht3.put("gpa", new Double(0.705));
-		db.insertIntoTable("People", ht3);
+		//db.insertIntoTable("People", ht3);
 		
 		
 		//Getting page
@@ -101,9 +117,9 @@ public class DBApp {
 //        	System.out.println(((Tuple)p.get(i)).theTuple.get("name"));
 //        }
 		// done
-//		Hashtable<String, Comparable> ht4 = new Hashtable<String, Comparable>();
-//		ht4.put("name", new String("Mohab"));
-//		db.deleteFromTable("People", ht4);
+		Hashtable<String, Comparable> ht4 = new Hashtable<String, Comparable>();
+		ht4.put("name", new String("Mohab"));
+		db.deleteFromTable("People", ht4);
 //		
 //		System.out.println("Num pages after ="+db.tables.get(0).pages.size());
 		
