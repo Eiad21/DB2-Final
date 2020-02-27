@@ -1,9 +1,12 @@
 package main;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -41,11 +44,10 @@ public class Table implements Serializable {
 		columnTypes.add("java.util.Date");
 		
 		
-		FileOutputStream filemeta = new FileOutputStream("metadata.csv");
-		ObjectOutputStream outmeta = new ObjectOutputStream(filemeta);
-		
-		outmeta.close();
-		filemeta.close();
+		FileWriter myWriter = new FileWriter("C:\\Users\\eiade\\Desktop\\metadata.csv", true);
+		for(int j = 0;j<columnNames.size();j++)
+            myWriter.write(tableName+","+columnNames.get(j)+","+columnTypes.get(j)+","+columnNames.get(j).equals(tableKey)+",false\n");  
+		myWriter.close();
 		
 		String directory = "C:\\Users\\eiade\\Desktop\\"+tableName+".txt";
 		File file = new File(directory);
@@ -164,11 +166,63 @@ public class Table implements Serializable {
 //	
 //} nbos 3leha hhhhhhhbm best effort service +1 farah :P
 	
-	// tdf3y kam??? oh yeah wt f**** :)
+	// tdf3y kam??? oh yeah wt f*** :)
 	public void updateTable(String strTableName, String key, Hashtable<String, Comparable> ht) throws IOException, ClassNotFoundException {
 		//if key is in HT throw exception
-		for(int pageCounter = 0;pageCounter<pages.size();pageCounter++) {
-			FileInputStream file = new FileInputStream(pages.get(pageCounter)); 
+		String row = "";
+		String type = "";
+		BufferedReader csvReader = new BufferedReader(new FileReader("C:\\Users\\eiade\\Desktop\\metadata.csv"));
+		while ((row = csvReader.readLine()) != null) {
+		    String[] data = row.split(",");
+		    // do something with the data
+		    System.out.println("running out of names:"+data[0]+"  "+data[3]);
+		    if(data[0].equals(tableName)&&data[3].equals("true")) {
+		    	System.out.println("alles gut");
+		    	type = data[2];
+		    	break;
+		    }
+		}
+		    //TODO:Handle exceptionification
+		    Comparable a = null;
+		    switch(type) {
+		    case "java.lang.Integer":
+		    	a = Integer.parseInt(key);
+		    	break;
+		    case "java.lang.Double":
+		    	a = Double.parseDouble(key);break;
+		    case "java.lang.String":
+		    	a = key;
+		    case "java.lang.Polygon": //later
+		    	break;
+		    case "java.lang.Boolean":
+		    	a = Boolean.parseBoolean(key);break;
+		    }
+		    int pageCounter = 0;
+			do {
+	            // Method for deserialization of object 
+
+				FileInputStream file = new FileInputStream(pages.get(pageCounter)); 
+	            ObjectInputStream in = new ObjectInputStream(file); 
+	            
+	            Page p = (Page)in.readObject();
+	            
+	            p.updatePage(tableName, a, ht);
+	            in.close();
+	            file.close();
+	            
+	            // Method for serialization of object
+	            FileOutputStream fileSER = new FileOutputStream(pages.get(pageCounter));
+                ObjectOutputStream outSER = new ObjectOutputStream(fileSER);
+                outSER.writeObject(p); 
+                
+                outSER.close(); 
+                fileSER.close();
+	            pageCounter++;
+			}while(pageCounter<pages.size());
+		csvReader.close();
+		
+		for(int pajeCounter = 0;pajeCounter<pages.size();pajeCounter++) {
+			FileInputStream file = new FileInputStream(pages.get(pajeCounter)); 
             ObjectInputStream in = new ObjectInputStream(file); 
              
             // Method for deserialization of object 
@@ -176,7 +230,7 @@ public class Table implements Serializable {
             // to be implemented VV
             // p.updatePage(ht);
             
-            FileOutputStream fileSER = new FileOutputStream(pages.get(pageCounter));
+            FileOutputStream fileSER = new FileOutputStream(pages.get(pajeCounter));
             ObjectOutputStream outSER = new ObjectOutputStream(fileSER);
             outSER.writeObject(p); 
             

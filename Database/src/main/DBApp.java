@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 public class DBApp {
@@ -23,23 +24,32 @@ public class DBApp {
 		String dir = "C:\\Users\\eiade\\Desktop\\metadata.csv";
 		File file = new File(dir);
 		if(file.createNewFile()) {
-			BufferedWriter bf = new BufferedWriter(new FileWriter( dir));
-			bf.write("Table Name, Column Name, Column Type, ClusteringKey, Indexed");
+			FileWriter myWriter = new FileWriter(dir, true);
+            myWriter.write("Table Name, Column Name, Column Type, ClusteringKey, Indexed\n");
+            myWriter.close();
 		}
 	}
 	public void createTable(String tableName, String key, Hashtable ht) throws IOException {
 		tables.add(new Table(tableName, key, ht));
 	}
 	
-	public void insertIntoTable(String tableName, Hashtable<String, Comparable> ht) throws IOException, ClassNotFoundException {
+	public void insertIntoTable(String tableName, Hashtable<String, Object> ht) throws IOException, ClassNotFoundException {
 		String dir  = "C:\\Users\\eiade\\Desktop\\" + tableName+".txt";
+		Hashtable<String, Comparable> newHt = new Hashtable<String, Comparable>();
+		Enumeration<String> enumeration = ht.keys();
+        // iterate using enumeration object
+        while(enumeration.hasMoreElements()) {
+ 
+            String htKey = enumeration.nextElement();
+            newHt.put(htKey, (Comparable)ht.get(htKey));
+        }
 		//deserialize 
 		FileInputStream file = new FileInputStream(dir); 
         ObjectInputStream in = new ObjectInputStream(file); 
         
         // Method for deserialization of object 
         Table t = (Table)in.readObject();
-		t.insertIntoTable(tableName, ht);
+		t.insertIntoTable(tableName, newHt);
 		//serialize
 		FileOutputStream fileO = new FileOutputStream(dir);
         ObjectOutputStream out = new ObjectOutputStream(fileO);
@@ -49,8 +59,17 @@ public class DBApp {
         fileO.close();
 	}
 	
-	public void deleteFromTable(String strTableName, Hashtable<String,Comparable> ht) throws ClassNotFoundException, IOException {
+	public void deleteFromTable(String strTableName, Hashtable<String,Object> ht) throws ClassNotFoundException, IOException {
 		String dir  = "C:\\Users\\eiade\\Desktop\\" + strTableName+".txt";
+		
+		Hashtable<String, Comparable> newHt = new Hashtable<String, Comparable>();
+		Enumeration<String> enumeration = ht.keys();
+        // iterate using enumeration object
+        while(enumeration.hasMoreElements()) {
+ 
+            String htKey = enumeration.nextElement();
+            newHt.put(htKey, (Comparable)ht.get(htKey));
+        }
 		//deserialize 
 		FileInputStream file = new FileInputStream(dir); 
         ObjectInputStream in = new ObjectInputStream(file); 
@@ -60,7 +79,7 @@ public class DBApp {
         // Method for deserialization of object 
         Table t = (Table)in.readObject();
         
-		t.deleteFromTable(strTableName, ht);
+		t.deleteFromTable(strTableName, newHt);
 		ArrayList<String> toRem = new ArrayList<String>();
 		for(String pageDir: t.pages) {
 			FileInputStream fileP = new FileInputStream(pageDir);
@@ -100,29 +119,29 @@ public class DBApp {
 		Hashtable<String, String> ht = new Hashtable<String, String>();
 		ht.put("id", "java.lang.Integer");
 		ht.put("name", "java.lang.String");
-		ht.put("gpa", "java.lang.double");
+		ht.put("gpa", "java.lang.Double");
 		
-		Hashtable<String, Comparable> ht1 = new Hashtable<String, Comparable>();
+		Hashtable<String, Object> ht1 = new Hashtable<String, Object>();
 		ht1.put("id", new Integer(1));
 		ht1.put("name", "Eiad");
 		ht1.put("gpa", new Double(0.7));
 		
 		
-		Hashtable<String, Comparable> ht2 = new Hashtable<String, Comparable>();
+		Hashtable<String, Object> ht2 = new Hashtable<String, Object>();
 		ht2.put("id", new Integer(3));
 		ht2.put("name", "Mohab");
 		ht2.put("gpa", new Double(0.71));
 		
 		
-		Hashtable<String, Comparable> ht3 = new Hashtable<String, Comparable>();
+		Hashtable<String, Object> ht3 = new Hashtable<String, Object>();
 		ht3.put("id", new Integer(2));
 		ht3.put("name", "Mai");
 		ht3.put("gpa", new Double(0.705));
 		
 		db.createTable("People", "id", ht);
-//		db.insertIntoTable("People", ht1);
-//		db.insertIntoTable("People", ht2);
-//		db.insertIntoTable("People", ht3);
+		db.insertIntoTable("People", ht1);
+		db.insertIntoTable("People", ht2);
+		db.insertIntoTable("People", ht3);
 		
 		
 		//Getting page
@@ -145,11 +164,45 @@ public class DBApp {
 //        	System.out.println(((Tuple)p.get(i)).theTuple.get("name"));
 //        }
 		// done
-		Hashtable<String, Comparable> ht4 = new Hashtable<String, Comparable>();
+		Hashtable<String, Object> ht4 = new Hashtable<String, Object>();
 		ht4.put("name", new String("Mohab"));
-		//db.deleteFromTable("People", ht4);
+		db.deleteFromTable("People", ht4);
 //		
 //		System.out.println("Num pages after ="+db.tables.get(0).pages.size());
-		
+		Hashtable<String, Object> ht5 = new Hashtable<String, Object>();
+		ht5.put("name", "Farahat");
+		db.updateTable("People", "2", ht5);
+	}
+	
+	public void updateTable(String tableName, String key, Hashtable<String,Object> ht) throws IOException, ClassNotFoundException {
+		Hashtable<String, Comparable> newHt = new Hashtable<String, Comparable>();
+		Enumeration<String> enumeration = ht.keys();
+        // iterate using enumeration object
+        while(enumeration.hasMoreElements()) {
+ 
+            String htKey = enumeration.nextElement();
+            newHt.put(htKey, (Comparable)ht.get(htKey));
+        }
+		String dir  = "C:\\Users\\eiade\\Desktop\\" + tableName+".txt";
+		//deserialize 
+		FileInputStream file = new FileInputStream(dir); 
+        ObjectInputStream in = new ObjectInputStream(file); 
+        
+
+        
+        // Method for deserialization of object 
+        Table t = (Table)in.readObject();
+        t.updateTable(tableName, key, newHt);
+        
+        in.close();
+        file.close();
+        
+      //serialize
+		FileOutputStream fileO = new FileOutputStream(dir);
+		ObjectOutputStream out = new ObjectOutputStream(fileO);
+		out.writeObject(t);
+
+		out.close();
+		fileO.close();
 	}
 }
