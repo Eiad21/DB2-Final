@@ -1,18 +1,31 @@
 package main;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.lang.reflect.Array;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
 public class DBApp {
 	ArrayList<Table> tables = new ArrayList<Table>();
-	public DBApp() {
-		
+	public DBApp() throws IOException {
+		String dir = "C:\\Users\\eiade\\Desktop\\metadata.csv";
+		File file = new File(dir);
+		if(file.createNewFile()) {
+			BufferedWriter bf = new BufferedWriter(new FileWriter( dir));
+			bf.write("Table Name, Column Name, Column Type, ClusteringKey, Indexed");
+		}
 	}
 	public void createTable(String tableName, String key, Hashtable ht) throws IOException {
 		tables.add(new Table(tableName, key, ht));
@@ -42,22 +55,34 @@ public class DBApp {
 		FileInputStream file = new FileInputStream(dir); 
         ObjectInputStream in = new ObjectInputStream(file); 
         
+
+        
         // Method for deserialization of object 
         Table t = (Table)in.readObject();
+        
 		t.deleteFromTable(strTableName, ht);
-		
+		ArrayList<String> toRem = new ArrayList<String>();
 		for(String pageDir: t.pages) {
 			FileInputStream fileP = new FileInputStream(pageDir);
 			ObjectInputStream inP = new ObjectInputStream(fileP);
 			
+			
+			
 			Page p = (Page) inP.readObject();
+			
+			inP.close();
+			fileP.close();
+			System.out.println("page size ="+p.size());
 			if(p.size()==0) {
-				File toDel = new File(pageDir);
-            	System.out.println(pageDir);
-            	System.out.println(toDel.delete());
-            	t.pages.remove(pageDir);
+				System.out.println("condition");
+				Path path  = Paths.get(pageDir); 
+				Files.delete(path);
+            	toRem.add(pageDir);
 			}
 		}
+		t.pages.removeAll(toRem);
+		in.close();
+        file.close();
 		
 		//serialize
 		FileOutputStream fileO = new FileOutputStream(dir);
@@ -76,25 +101,28 @@ public class DBApp {
 		ht.put("id", "java.lang.Integer");
 		ht.put("name", "java.lang.String");
 		ht.put("gpa", "java.lang.double");
-		//db.createTable("People", "id", ht);
 		
 		Hashtable<String, Comparable> ht1 = new Hashtable<String, Comparable>();
 		ht1.put("id", new Integer(1));
 		ht1.put("name", "Eiad");
 		ht1.put("gpa", new Double(0.7));
-		//db.insertIntoTable("People", ht1);
+		
 		
 		Hashtable<String, Comparable> ht2 = new Hashtable<String, Comparable>();
 		ht2.put("id", new Integer(3));
 		ht2.put("name", "Mohab");
 		ht2.put("gpa", new Double(0.71));
-		//db.insertIntoTable("People", ht2);
+		
 		
 		Hashtable<String, Comparable> ht3 = new Hashtable<String, Comparable>();
 		ht3.put("id", new Integer(2));
 		ht3.put("name", "Mai");
 		ht3.put("gpa", new Double(0.705));
-		//db.insertIntoTable("People", ht3);
+		
+		db.createTable("People", "id", ht);
+//		db.insertIntoTable("People", ht1);
+//		db.insertIntoTable("People", ht2);
+//		db.insertIntoTable("People", ht3);
 		
 		
 		//Getting page
@@ -119,7 +147,7 @@ public class DBApp {
 		// done
 		Hashtable<String, Comparable> ht4 = new Hashtable<String, Comparable>();
 		ht4.put("name", new String("Mohab"));
-		db.deleteFromTable("People", ht4);
+		//db.deleteFromTable("People", ht4);
 //		
 //		System.out.println("Num pages after ="+db.tables.get(0).pages.size());
 		

@@ -40,6 +40,13 @@ public class Table implements Serializable {
 	    columnNames.add("TouchDate");
 		columnTypes.add("java.util.Date");
 		
+		
+		FileOutputStream filemeta = new FileOutputStream("metadata.csv");
+		ObjectOutputStream outmeta = new ObjectOutputStream(filemeta);
+		
+		outmeta.close();
+		filemeta.close();
+		
 		String directory = "C:\\Users\\eiade\\Desktop\\"+tableName+".txt";
 		File file = new File(directory);
 		file.createNewFile();
@@ -126,6 +133,8 @@ public class Table implements Serializable {
 	             
 	            // Method for deserialization of object 
 	            Page p = (Page)in.readObject();
+	            in.close();
+	            file.close();
 	            System.out.println("Size before delete= "+p.size());
 	            p.deleteFromPage(ht);
 	            
@@ -135,13 +144,6 @@ public class Table implements Serializable {
                 
                 outSER.close(); 
                 fileSER.close();
-	            if(p.size()==0) {
-	            	String dir = pages.get(pageCounter);
-	            	File toDel = new File(pages.get(pageCounter));
-	            	System.out.println(pages.get(pageCounter));
-	            	toDel.delete();
-	            	pages.remove(pageCounter);
-	            }
 	            System.out.println("Size after delete= "+p.size());
 			}
 	} //eficiency ya bro
