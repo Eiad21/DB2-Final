@@ -61,6 +61,9 @@ public class Table implements Serializable {
 	}
 	
 	public void insertIntoTable(String tableName, Hashtable<String, Comparable> ht) throws IOException, ClassNotFoundException {
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");  
+	    Date date = new Date();
+		ht.put("TouchDate", date);
 		Tuple t = new Tuple(ht, tableKey);
 		if(pages.size()==0) {
 			System.out.println("test2");
@@ -167,8 +170,24 @@ public class Table implements Serializable {
 //} nbos 3leha hhhhhhhbm best effort service +1 farah :P
 	
 	// tdf3y kam??? oh yeah wt f*** :)
-	public void updateTable(String strTableName, String key, Hashtable<String, Comparable> ht) throws IOException, ClassNotFoundException {
+	public void updateTable(String strTableName, String key, Hashtable<String, Comparable> ht) throws IOException, ClassNotFoundException, DBUpdateException {
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");  
+	    Date date = new Date();
+		ht.put("TouchDate", date);
 		//if key is in HT throw exception
+		if(ht.containsKey(tableKey)) {
+			throw new DBUpdateException("Cannot change value of clustering key");
+		}
+		// if HT contains key not in table throw exception
+		Enumeration<String> enumeration = ht.keys();
+        // iterate using enumeration object
+        while(enumeration.hasMoreElements()) {
+ 
+            String key0 = enumeration.nextElement();
+            if(!columnNames.contains(ht.get(key0)))
+            	throw new DBUpdateException("Table does not contain column named "+ ht.get(key0));
+            //TODO: check type is compatible
+        }
 		String row = "";
 		String type = "";
 		BufferedReader csvReader = new BufferedReader(new FileReader("C:\\Users\\eiade\\Desktop\\metadata.csv"));

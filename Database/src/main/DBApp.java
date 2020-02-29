@@ -165,12 +165,12 @@ public class DBApp {
 //        }
 		// done
 		Hashtable<String, Object> ht4 = new Hashtable<String, Object>();
-		ht4.put("name", new String("Mohab"));
-		db.deleteFromTable("People", ht4);
+		ht4.put("name", new String("Eiad"));
+		//db.deleteFromTable("People", ht4);
 //		
 //		System.out.println("Num pages after ="+db.tables.get(0).pages.size());
 		Hashtable<String, Object> ht5 = new Hashtable<String, Object>();
-		ht5.put("name", "Farahat");
+		ht5.put("id", 1);
 		db.updateTable("People", "2", ht5);
 	}
 	
@@ -192,7 +192,12 @@ public class DBApp {
         
         // Method for deserialization of object 
         Table t = (Table)in.readObject();
-        t.updateTable(tableName, key, newHt);
+        try {
+			t.updateTable(tableName, key, newHt);
+		} catch (DBUpdateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         in.close();
         file.close();
