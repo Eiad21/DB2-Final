@@ -6,8 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.text.SimpleDateFormat;
 import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -33,12 +35,15 @@ public class Sandbox {
 //		   if ( first > last ){  
 //		      System.out.println("Element is not found!");
 //		   } 
-		Vector v = new Vector<Integer>();
-		v.add(1);
-		//v.add(1);
-		v.add(2);
-		
-		System.out.println(getFirstOccurence(v, 2));
+//		Vector v = new Vector<Integer>();
+//		v.add(1);
+//		//v.add(1);
+//		v.add(2);
+//		
+//		System.out.println(getFirstOccurence(v, 2));
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");  
+	    Date date = new Date();  
+	    System.out.println(formatter.format(date));
 	}
 	
 	public static int getFirstOccurence(Vector v, Comparable key) {
