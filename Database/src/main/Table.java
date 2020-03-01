@@ -35,7 +35,7 @@ public class Table implements Serializable {
 		Enumeration<String> enumeration = ht.keys();
 		// iterate using enumeration object
 		while (enumeration.hasMoreElements()) {
-			
+
 			String key = enumeration.nextElement();
 			columnNames.add(key);
 			columnTypes.add((String) ht.get(key));
@@ -185,62 +185,59 @@ public class Table implements Serializable {
 		while ((row = csvReader.readLine()) != null) {
 			String[] data = row.split(",");
 			// do something with the data
-			System.out.println("running out of names:" + data[0] + "  " + data[3]);
-			if (data[0].equals(tableName) && data[3].equals("true")) {
+			if (data[0].equals(tableName)) {
 				columnNames.add(data[1]);
 				columnTypes.add(data[2]);
-				if (data[3].equals("true"))
+				if (data[3].equals("true")) {
 					type = data[2];
-				tableKey = data[1];
+					tableKey = data[1];
+				}
 			}
 		}
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		Date date = new Date();
 		ht.put("TouchDate", date);
 		// if key is in HT throw exception
+		System.out.println(tableKey);
 		if (ht.containsKey(tableKey)) {
 			throw new DBUpdateException("Cannot change value of clustering key");
 		}
 		// if HT contains key not in table throw exception
 		Enumeration<String> enumeration = ht.keys();
 		// iterate using enumeration object
+		System.out.println(columnNames);
 		while (enumeration.hasMoreElements()) {
 
 			String key0 = enumeration.nextElement();
-			if (!columnNames.contains(ht.get(key0)))
-				throw new DBUpdateException("Table does not contain column named " + ht.get(key0));
-			// TODO: check type is compatible
-			enumeration = ht.keys();
-			// iterate using enumeration object
-			while (enumeration.hasMoreElements()) {
-				String theName = enumeration.nextElement();
-				Comparable theValue = ht.get(theName);
-				// TODO: check type is compatible
-			}
+			System.out.println("loop");
+			if (!columnNames.contains(key0))
+				throw new DBUpdateException("Table does not contain column named " + key0);
 		}
 		enumeration = ht.keys();
 		// iterate using enumeration object
-		while (enumeration.hasMoreElements()) {
-
-			String key0 = enumeration.nextElement();
-			if (!columnNames.contains(ht.get(key0)))
-				throw new DBUpdateException("Table does not contain column named " + ht.get(key0));
-			// TODO: check type is compatible
-		}
-		// TODO:Handle exceptionification
 		Comparable a = null;
 		switch (type) {
 		case "java.lang.Integer":
+			try {
 			a = Integer.parseInt(key);
+			}catch(NumberFormatException e) {
+				throw new DBUpdateException("Incorrect type entered .. Should be Integer");
+			}
 			break;
 		case "java.lang.Double":
+			try {
 			a = Double.parseDouble(key);
+			}catch(NumberFormatException e) {
+				throw new DBUpdateException("Incorrect type entered .. Should be Double");
+			}
 			break;
 		case "java.lang.String":
 			a = key;
 		case "java.lang.Polygon": // later
 			break;
 		case "java.lang.Boolean":
+			if(!(key.equals("false")||key.equals("true")))
+				throw new DBUpdateException("Incorrect type entered .. Should be Boolean");
 			a = Boolean.parseBoolean(key);
 			break;
 		}
