@@ -138,11 +138,11 @@ public class DBApp {
 		ht3.put("name", "Mai");
 		ht3.put("gpa", new Double(0.705));
 		
-		db.createTable("People", "id", ht);
-		db.insertIntoTable("People", ht1);
-		db.insertIntoTable("People", ht2);
-		db.insertIntoTable("People", ht3);
-		
+//		db.createTable("People", "id", ht);
+//		db.insertIntoTable("People", ht1);
+//		db.insertIntoTable("People", ht2);
+//		db.insertIntoTable("People", ht3);
+//		
 		
 		//Getting page
 		// Reading the object from a file 
@@ -170,8 +170,8 @@ public class DBApp {
 //		
 //		System.out.println("Num pages after ="+db.tables.get(0).pages.size());
 		Hashtable<String, Object> ht5 = new Hashtable<String, Object>();
-		ht5.put("id", 1);
-		db.updateTable("People", "2", ht5);
+		ht5.put("name", "Mark");
+		db.updateTable("People", "s", ht5);
 	}
 	
 	public void updateTable(String tableName, String key, Hashtable<String,Object> ht) throws IOException, ClassNotFoundException {
